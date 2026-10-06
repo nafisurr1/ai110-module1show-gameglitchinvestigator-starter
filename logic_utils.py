@@ -42,12 +42,12 @@ def check_guess(guess, secret):
         return "Win", "🎉 Correct!"
 
     try:
-        # FIXME: Logic breaks here: the hint messages are backwards. A guess that is
-        # too high says "Go HIGHER!" and a guess that is too low says "Go LOWER!".
+        # FIX: The hint messages were swapped (too high said "Go HIGHER!"). Swapped them
+        # back with an AI coding assistant in agent mode; checked with pytest and the app.
         if guess > secret:
-            return "Too High", "📈 Go HIGHER!"
+            return "Too High", "📉 Go LOWER!"
         else:
-            return "Too Low", "📉 Go LOWER!"
+            return "Too Low", "📈 Go HIGHER!"
     # FIXME: Logic breaks here too: this fallback only runs because the caller passes
     # the secret as a str, and it then compares the numbers as text ("9" > "50").
     except TypeError:
@@ -55,8 +55,8 @@ def check_guess(guess, secret):
         if g == secret:
             return "Win", "🎉 Correct!"
         if g > secret:
-            return "Too High", "📈 Go HIGHER!"
-        return "Too Low", "📉 Go LOWER!"
+            return "Too High", "📉 Go LOWER!"
+        return "Too Low", "📈 Go HIGHER!"
 
 
 def update_score(current_score: int, outcome: str, attempt_number: int):
