@@ -26,6 +26,12 @@ Document at least 3 bugs you found. Add rows as needed.
 - Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
 - Give one example of an AI suggestion you did not accept as written (including what the AI suggested, why you rejected or changed it, and how you verified your version). It does not have to be a suggestion that was wrong: over-engineered, out of scope, harder to read, or a poor fit for this codebase all count.
 
+**AI tools used.** One AI coding assistant, working in agent mode: it read `app.py`, `logic_utils.py` and the tests, edited the files, ran `pytest`, and drove the Streamlit app. I did not use any other AI tool on this project.
+
+**A suggestion that was correct (bug 1, the reversed hints).** The assistant pointed out that the outcome labels in `check_guess` were right ("Too High" for 60 vs 50) and only the messages were swapped, which is why the three starter tests, which only look at the outcome, could never catch a lying hint. Its suggestion was to assert on the message text as well, so it wrote `test_too_high_hint_says_go_lower` and `test_too_low_hint_says_go_higher` first and then swapped the messages. That was correct because the starter tests stayed green while the hints were wrong, so only message-level tests could fail for the right reason. I verified it by running pytest before the fix (2 failed, 3 passed) and after (5 passed), and then in the live game, where a guess above the secret now says "Go LOWER!".
+
+**A suggestion not accepted as written (bug 2, the str secret).** The AI-written starter code handled the str secret with an `except TypeError` fallback in `check_guess` that compares the guess as text. The tempting fix was to keep that fallback and only swap its messages, but I rejected it because the fallback only exists to cope with `app.py` turning the secret into a `str` on even attempts, and it hid the real bug: 9 against `"50"` came out as "Too High". I removed the cast in `app.py` and deleted the fallback so `check_guess` always compares two ints. I verified it with an `AppTest` test that failed before the fix ("attempt 2: guess 9 vs secret 50 showed '📉 Go LOWER!'") and passes after, and in the live game on an even attempt.
+
 ---
 
 ## 3. Debugging and testing your fixes
@@ -34,6 +40,12 @@ Document at least 3 bugs you found. Add rows as needed.
 - Describe at least one test you ran (manual or using pytest)  
   and what it showed you about your code.
 - Did AI help you design or understand any tests? How?
+
+**How I decided a bug was fixed.** I wrote the test for each bug first and watched it fail on the buggy code, then made the change and watched it pass, so a green run actually meant something. After that I played the real app and compared the hints against the secret shown in the Developer Debug Info panel.
+
+**Tests I ran.** I ran `pytest` at each step. The starter tests failed first with `NotImplementedError` because the logic was still stubbed, and they passed (3 passed) once I moved the functions into `logic_utils.py`. The bug 1 tests then failed (2 failed, 3 passed) and passed after the fix (5 passed), and the final run is 7 passed. In the live game (secret 39) a guess of 9 said "Go HIGHER!", 95 said "Go LOWER!", 100 on an even attempt said "Go LOWER!", and 39 won with a final score of 35.
+
+**How AI helped with the tests.** The assistant wrote the tests, and it also showed me a limit of the obvious test. A plain `check_guess(9, 50)` unit test passes even with bug 2 present, because the `str()` cast lives in `app.py`, so it added `test_app_hints_stay_numeric_on_every_attempt`, which drives the real app with Streamlit's `AppTest` on both even and odd attempts. It also updated the three starter tests to unpack the `(outcome, message)` tuple that `check_guess` is documented to return, instead of changing the function to match them. Bug 3 (New Game does not reset status, score or history) is still open and marked with a `FIXME` in `app.py`.
 
 ---
 
