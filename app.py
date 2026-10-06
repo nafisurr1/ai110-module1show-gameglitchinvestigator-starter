@@ -34,10 +34,14 @@ def check_guess(guess, secret):
         return "Win", "🎉 Correct!"
 
     try:
+        # FIXME: Logic breaks here: the hint messages are backwards. A guess that is
+        # too high says "Go HIGHER!" and a guess that is too low says "Go LOWER!".
         if guess > secret:
             return "Too High", "📈 Go HIGHER!"
         else:
             return "Too Low", "📉 Go LOWER!"
+    # FIXME: Logic breaks here too: this fallback only runs because the caller passes
+    # the secret as a str, and it then compares the numbers as text ("9" > "50").
     except TypeError:
         g = str(guess)
         if g == secret:
@@ -131,6 +135,8 @@ with col2:
 with col3:
     show_hint = st.checkbox("Show hint", value=True)
 
+# FIXME: Logic breaks here (bug 3, not fixed yet): New Game does not reset status,
+# score or history, ignores the difficulty range, and sets attempts to 0 instead of 1.
 if new_game:
     st.session_state.attempts = 0
     st.session_state.secret = random.randint(1, 100)
@@ -155,6 +161,8 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
+        # FIXME: Logic breaks here: on even attempts the secret is turned into a str,
+        # so check_guess compares the guess as text instead of as a number.
         if st.session_state.attempts % 2 == 0:
             secret = str(st.session_state.secret)
         else:

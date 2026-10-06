@@ -14,9 +14,9 @@ Document at least 3 bugs you found. Add rows as needed.
 
 | Input | Expected Behavior | Actual Behavior | Console Output / Error |
 |-------|-------------------|-----------------|------------------------|
-| | | | |
-| | | | |
-| | | | |
+| Secret is 50; I guess 60, then 40 | Guess 60 is too high, so the hint should say to go LOWER. Guess 40 is too low, so it should say to go HIGHER. | The hints are backwards: 60 shows "📈 Go HIGHER!" and 40 shows "📉 Go LOWER!". | No error. `check_guess(100, 50)` returns `('Too High', '📈 Go HIGHER!')`. |
+| Any guess on an even-numbered attempt (the first Submit is already attempt 2 because `attempts` starts at 1 and is incremented before the check) | The comparison should be numeric on every attempt: 9 against a secret of 50 is "Too Low". | `app.py` casts the secret to a `str` on even attempts, so `check_guess` falls into its `TypeError` branch and compares text: 9 against `"50"` is "Too High" and 100 against `"50"` is "Too Low". | No error; the `except TypeError` fallback hides it. `check_guess(9, '50')` returns `('Too High', '📈 Go HIGHER!')`. |
+| Win a game, click "New Game 🔁", then submit a guess | A fresh game starts: status, score and history reset, and the new guess is checked. | The new guess is rejected with "You already won. Start a new game to play again." because `status` is still `won`. Score (70) and history also carry over, `attempts` resets to 0 instead of 1, and the new secret ignores the difficulty range. | No error. After New Game: `status = won`, `attempts = 0`, `score = 70`, `history = [50]`. |
 
 ---
 
