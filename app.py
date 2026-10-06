@@ -96,14 +96,10 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
-        # FIXME: Logic breaks here: on even attempts the secret is turned into a str,
-        # so check_guess compares the guess as text instead of as a number.
-        if st.session_state.attempts % 2 == 0:
-            secret = str(st.session_state.secret)
-        else:
-            secret = st.session_state.secret
-
-        outcome, message = check_guess(guess_int, secret)
+        # FIX: The secret was turned into a str on even attempts, so guesses were compared
+        # as text. Always pass the int secret now. Found and fixed with an AI coding
+        # assistant in agent mode; checked with an AppTest-driven pytest and the live game.
+        outcome, message = check_guess(guess_int, st.session_state.secret)
 
         if show_hint:
             st.warning(message)

@@ -41,22 +41,13 @@ def check_guess(guess, secret):
     if guess == secret:
         return "Win", "🎉 Correct!"
 
-    try:
-        # FIX: The hint messages were swapped (too high said "Go HIGHER!"). Swapped them
-        # back with an AI coding assistant in agent mode; checked with pytest and the app.
-        if guess > secret:
-            return "Too High", "📉 Go LOWER!"
-        else:
-            return "Too Low", "📈 Go HIGHER!"
-    # FIXME: Logic breaks here too: this fallback only runs because the caller passes
-    # the secret as a str, and it then compares the numbers as text ("9" > "50").
-    except TypeError:
-        g = str(guess)
-        if g == secret:
-            return "Win", "🎉 Correct!"
-        if g > secret:
-            return "Too High", "📉 Go LOWER!"
-        return "Too Low", "📈 Go HIGHER!"
+    # FIX: The hint messages were swapped (too high said "Go HIGHER!"). Swapped them
+    # back with an AI coding assistant in agent mode; checked with pytest and the app.
+    # FIX: Removed the `except TypeError` fallback that compared the numbers as text
+    # when the secret arrived as a str; both arguments are ints now (see app.py).
+    if guess > secret:
+        return "Too High", "📉 Go LOWER!"
+    return "Too Low", "📈 Go HIGHER!"
 
 
 def update_score(current_score: int, outcome: str, attempt_number: int):
