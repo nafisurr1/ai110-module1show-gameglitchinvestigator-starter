@@ -8,6 +8,10 @@ Answer each question in 3 to 5 sentences. Be specific and honest about what actu
 - List at least two concrete bugs you noticed at the start  
   (for example: "the hints were backwards").
 
+**What the game looked like.** The app loaded without errors and looked playable: a sidebar with Difficulty, a "Make a guess" box, Submit Guess and New Game buttons, and a Developer Debug Info panel that shows the secret. The problems only showed up once I ran guesses through it, because the hints did not agree with the secret in the debug panel. The "Attempts left" count also started one lower than the 8 attempts allowed.
+
+**Bugs I noticed at the start.** First, the hints were backwards: a guess of 60 against a secret of 50 said "Go HIGHER!". Second, on even-numbered attempts the secret was turned into a string, so guesses like 9 and 100 were compared as text and gave the wrong outcome. Third, clicking New Game after a win did not reset the game, so the next guess was rejected with "You already won".
+
 **Bug Reproduction Log**
 
 Document at least 3 bugs you found. Add rows as needed.
@@ -53,6 +57,8 @@ Document at least 3 bugs you found. Add rows as needed.
 
 - How would you explain Streamlit "reruns" and session state to a friend who has never used Streamlit?
 
+**Reruns and session state.** Streamlit re-runs the whole script from top to bottom every time you click a button or change a widget, so ordinary variables are created fresh on every click. `st.session_state` is like a dictionary that survives those reruns, so anything the game has to remember, such as the secret, the attempts, the score and the status, lives there. Each value is guarded with `if "secret" not in st.session_state` so it is only set the first time, which is why the secret does not change on every click. Because the script runs in order, the Developer Debug Info panel prints before the Submit logic runs, so it showed the previous attempt count and history until the next rerun, which confused me at first.
+
 ---
 
 ## 5. Looking ahead: your developer habits
@@ -61,3 +67,9 @@ Document at least 3 bugs you found. Add rows as needed.
   - This could be a testing habit, a prompting strategy, or a way you used Git.
 - What is one thing you would do differently next time you work with AI on a coding task?
 - In one or two sentences, describe how this project changed the way you think about AI generated code.
+
+**A habit to reuse.** Write the failing test first and watch it fail before changing the code. The starter tests only checked the outcome label, so they stayed green while the hints lied, and seeing my new tests go red then green showed that they were actually testing the bug.
+
+**What I would do differently.** I would start a fresh chat for each bug and read each file's diff as the assistant produces it, instead of reviewing everything at the end. I also want to ask the assistant to explain why a bug happens before it edits anything, so I am not just accepting a patch.
+
+**How my view of AI generated code changed.** AI generated code can look tidy and come with passing tests and still be wrong, like the `except TypeError` fallback that quietly hid a real bug. I now treat it as a draft I have to verify myself, not as a finished result.
